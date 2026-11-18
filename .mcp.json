@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "treeple": {
+      "type": "http",
+      "url": "https://mcp.treeple.kz/apps/claude/mcp"
+    }
+  }
+}

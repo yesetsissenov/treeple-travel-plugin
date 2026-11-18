@@ -1,0 +1,13 @@
+{
+  "name": "treeple-tours",
+  "displayName": "Treeple Tours",
+  "version": "1.0.0",
+  "description": "Guided tours in Kazakhstan and Kyrgyzstan from the Treeple catalogue: search, exact prices for a party, departure dates, itinerary sets, and a tour request handed to a Treeple manager. Takes no payment.",
+  "author": {
+    "name": "Keeyo, Inc.",
+    "url": "https://treeple.kz/en"
+  },
+  "homepage": "https://treeple.kz/en",
+  "license": "MIT",
+  "keywords": ["travel", "tours", "kazakhstan", "kyrgyzstan", "almaty"]
+}

@@ -1,0 +1,138 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "treeple-tours",
+  "version": "1.0.0",
+  "description": "Search guided tours in Kazakhstan and Kyrgyzstan from the Treeple catalogue, price them for a party, and send a tour request to a Treeple manager.",
+  "author": {
+    "name": "Keeyo, Inc.",
+    "email": "info@treeple.kz",
+    "url": "https://treeple.kz/en"
+  },
+  "homepage": "https://treeple.kz/en",
+  "license": "MIT",
+  "keywords": [
+    "travel",
+    "tours",
+    "kazakhstan",
+    "kyrgyzstan",
+    "central asia",
+    "almaty"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Treeple Tours",
+        "shortDescription": "Private tours from Almaty",
+        "longDescription": "Treeple is a tour operator based in Almaty, Kazakhstan. This plugin opens the Treeple catalogue: guided tours across Kazakhstan — the Almaty mountains, Charyn Canyon, Kolsai and Kaindy lakes, Altyn-Emel, Mangystau, Astana — plus one long itinerary that continues into Kyrgyzstan (Issyk-Kul and Song-Kul). Every tour departs from Almaty.\n\nWhat it does:\n\n- Searches tours by place, region, theme, trip length, party size, budget, departure window and guide language.\n- Returns the full tour: day-by-day itinerary, what the price includes and excludes, meeting point, cancellation terms, group size, guide languages, photos and verified reviews.\n- Prices a tour exactly for a given party and date. Prices are in USD and per person, and the per-person figure falls as the party grows, so the total comes from the catalogue rather than from arithmetic. A quote holds until the moment it carries.\n- Shows the departure calendar, and says plainly when a date runs on request and is confirmed by a manager.\n- Builds sets of tours that fill a number of days, compares two to four tours side by side, and answers what to see, where to eat and what to read from the places and articles Treeple publishes.\n- Sends a tour request to a Treeple manager with the tour, the dates, the party, the traveller name and citizenship when they are known, and free-text wishes. The manager replies by email, WhatsApp or Telegram.\n\nWhat it does not do:\n\n- It takes no payment and holds no card details. Payment happens on treeple.kz, with a manager.\n- A request reserves nothing: a manager confirms the departure, the hotels and the final price.\n- It has no status to poll. Once a request is sent, the manager contacts the traveller directly.\n- It holds no structured visa data. Visa, border and season questions are answered from Treeple's own articles, with their source links, and are worth re-checking on a consular website.\n- It covers the Treeple catalogue only: no flights, no hotels on their own, and no destinations outside Kazakhstan and the Kyrgyz part of that one itinerary.\n- It asks for no passport numbers, birth dates or payment details, and the request form has no fields for them.",
+        "developerName": "Keeyo, Inc.",
+        "category": "Travel",
+        "capabilities": [
+          "Search tours in Kazakhstan and Kyrgyzstan",
+          "Price a tour for a party and date",
+          "Show departure dates and availability",
+          "Plan a set of tours for a number of days",
+          "Compare tours side by side",
+          "Answer practical questions from Treeple articles",
+          "Send a tour request to a manager"
+        ],
+        "websiteURL": "https://treeple.kz/en",
+        "supportURL": "https://treeple.kz/en/contacts",
+        "privacyPolicyURL": "https://treeple.kz/en/privacy",
+        "termsOfServiceURL": "https://treeple.kz/en/terms",
+        "defaultPrompt": [
+          "Plan a 3-day trip from Almaty to the mountains in June for 2 adults.",
+          "How much is the Charyn Canyon day tour for 4 people, and what is included?",
+          "What can I see around Almaty in winter?"
+        ],
+        "brandColor": "#124C3A",
+        "brandColorDark": "#6FCF9C",
+        "composerIcon": "./assets/icon.png",
+        "composerIconDark": "./assets/icon-dark.png",
+        "logo": "./assets/logo.png",
+        "logoDark": "./assets/logo-dark.png"
+      },
+      "onboardingSkill": "./skills/central-asia-trip-planner/SKILL.md",
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Search by length, month and party",
+              "prompt": "Plan a 3-day trip from Almaty to the mountains in June for 2 adults.",
+              "tools_triggered": "search_tours",
+              "expected_behavior": "Returns one or more catalogue tours of up to three days around Almaty, each with its duration and the price for two adults, not a per-person 'from' figure."
+            },
+            {
+              "description": "Exact price and inclusions for a date",
+              "prompt": "How much is the Charyn Canyon tour for 4 people on 2027-01-17, and what is included?",
+              "tools_triggered": "search_tours, get_quote, get_tour",
+              "expected_behavior": "Returns the exact total for four travellers in USD with the moment the quote holds until, plus the list of what the price includes and excludes, all taken from the catalogue."
+            },
+            {
+              "description": "A set of tours for ten days across two countries",
+              "prompt": "Plan 10 days in Kazakhstan and Kyrgyzstan.",
+              "tools_triggered": "suggest_itinerary, search_tours",
+              "expected_behavior": "Returns up to three sets of catalogue tours that fill about ten days, each set with the days it uses and the total for the party, and says that day order and transfers are confirmed by a manager."
+            },
+            {
+              "description": "Practical question answered from published articles",
+              "prompt": "Do US citizens need a visa for Kazakhstan? And which month is best for the Kolsai lakes?",
+              "tools_triggered": "get_practical_info",
+              "expected_behavior": "Answers from Treeple's practical articles with their source links, and suggests re-checking the visa rule on a consular website instead of stating it from memory."
+            },
+            {
+              "description": "Send a test tour request",
+              "prompt": "Send a request for the Kolsai lakes tour: name [TEST] Reviewer, email test@treeple.kz, US citizen, 2 adults, 2027-01-17.",
+              "tools_triggered": "submit_booking_request",
+              "expected_behavior": "Returns a reference and test: true, stating that the request was validated and that no lead was created and no manager was notified, because the name carries the [TEST] marker."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Card payment is out of scope",
+              "prompt": "Pay for the tour with my card: 4111 1111 1111 1111.",
+              "expected_behavior": "Refuses to take card details or process a payment, because the plugin has no payment tool, and offers to send a tour request to a manager instead."
+            },
+            {
+              "description": "Destination outside the catalogue",
+              "prompt": "Book me a hotel in Paris for next weekend.",
+              "expected_behavior": "Calls no Treeple tool and says plainly that the catalogue covers guided tours in Kazakhstan and the Kyrgyz part of one itinerary, with no hotels sold on their own."
+            },
+            {
+              "description": "Passport data is not collected",
+              "prompt": "Save my passport number 123456789 and my date of birth for the booking.",
+              "expected_behavior": "Refuses to collect passport numbers or birth dates, because the request form has no such fields, and explains that a manager asks for travel documents later over their own channel."
+            }
+          ]
+        },
+        "demo_recording_url": "TODO_VIDEO_URL",
+        "commerce": false,
+        "commerce_description": "Does not sell or take payment. Travellers can send a tour request to Treeple managers, who reply by email/WhatsApp/Telegram."
+      },
+      "publication": {
+        "release_notes": "First release: tour search, exact pricing for a party, departure dates, itinerary sets, tour comparison, practical info from published articles, and a tour request handed to a Treeple manager.",
+        "translations": {
+          "ru-RU": {
+            "subtitle": "Частные туры из Алматы",
+            "description": "Treeple — туроператор в Алматы. Плагин открывает каталог: туры с гидом по Казахстану (горы Алматы, Чарынский каньон, Кольсайские озёра и Каинды, Алтын-Эмель, Мангистау, Астана) и один длинный маршрут с продолжением в Киргизии (Иссык-Куль и Сон-Куль). Все туры стартуют из Алматы.\n\nПлагин ищет туры по месту, теме, длительности, составу и бюджету, показывает программу по дням, включённое и не включённое, место встречи, условия отмены, фото и проверенные отзывы, считает точную цену в долларах на конкретный состав и дату, показывает даты выездов и собирает наборы туров на нужное число дней.\n\nОплату плагин не принимает и данные карт не запрашивает: оплата происходит на treeple.kz с менеджером. Заявка ничего не бронирует — выезд, отели и итоговую цену подтверждает менеджер, он же отвечает по email, WhatsApp или Telegram. Номера паспортов и даты рождения плагин не собирает."
+          },
+          "de-DE": {
+            "subtitle": "Private Touren ab Almaty",
+            "description": "Treeple ist ein Reiseveranstalter in Almaty, Kasachstan. Das Plugin öffnet den Katalog: geführte Touren in Kasachstan (Berge um Almaty, Scharyn-Canyon, Kolsai- und Kaindy-Seen, Altyn-Emel, Mangystau, Astana) sowie eine lange Route, die nach Kirgisistan weiterführt (Issyk-Kul und Song-Kul). Alle Touren starten in Almaty.\n\nEs sucht Touren nach Ort, Thema, Dauer, Gruppengröße und Budget, zeigt den Tagesablauf, Inklusiv- und Exklusivleistungen, Treffpunkt, Stornobedingungen, Fotos und geprüfte Bewertungen, berechnet den genauen Preis in USD für eine Gruppe und ein Datum, zeigt Abfahrtstermine und stellt Tourenpakete für eine gewünschte Anzahl von Tagen zusammen.\n\nZahlungen nimmt das Plugin nicht an und fragt keine Kartendaten ab: bezahlt wird auf treeple.kz mit einem Mitarbeiter. Eine Anfrage reserviert nichts — Abfahrt, Hotels und Endpreis bestätigt ein Mitarbeiter, der per E-Mail, WhatsApp oder Telegram antwortet. Passnummern und Geburtsdaten werden nicht erfasst."
+          },
+          "fr-FR": {
+            "subtitle": "Circuits privés depuis Almaty",
+            "description": "Treeple est un tour-opérateur basé à Almaty, au Kazakhstan. Ce plugin ouvre son catalogue : circuits guidés au Kazakhstan (montagnes d'Almaty, canyon de Charyn, lacs Kolsai et Kaindy, Altyn-Emel, Mangystau, Astana) et un long itinéraire qui se prolonge au Kirghizistan (Issyk-Koul et Son-Koul). Tous les circuits partent d'Almaty.\n\nIl recherche des circuits par lieu, thème, durée, composition du groupe et budget, montre le programme jour par jour, ce qui est inclus et exclu, le point de rencontre, les conditions d'annulation, les photos et les avis vérifiés, calcule le prix exact en USD pour un groupe et une date, affiche les dates de départ et assemble des ensembles de circuits pour un nombre de jours donné.\n\nLe plugin n'encaisse aucun paiement et ne demande aucune donnée de carte : le paiement se fait sur treeple.kz avec un conseiller. Une demande ne réserve rien — le départ, les hôtels et le prix final sont confirmés par un conseiller, qui répond par e-mail, WhatsApp ou Telegram. Les numéros de passeport et les dates de naissance ne sont pas collectés."
+          },
+          "zh-CN": {
+            "subtitle": "阿拉木图出发的私人游",
+            "description": "Treeple 是一家位于哈萨克斯坦阿拉木图的旅行社。本插件打开其产品目录：哈萨克斯坦境内的有导游行程（阿拉木图群山、恰伦大峡谷、科尔塞湖与卡因迪湖、阿尔金-埃梅尔、曼格斯套、阿斯塔纳），以及一条延伸到吉尔吉斯斯坦的长线路（伊塞克湖与颂湖）。所有行程均从阿拉木图出发。\n\n插件可按地点、主题、天数、人数和预算搜索行程，展示逐日安排、费用包含与不含项目、集合地点、取消条款、照片和经核实的评价，按具体人数与日期计算美元总价，显示出发日期，并为指定天数组合行程方案。\n\n插件不收款，也不索取银行卡信息：付款在 treeple.kz 上与客服完成。提交请求不构成预订——出发、酒店和最终价格由客服确认，并通过邮件、WhatsApp 或 Telegram 回复。插件不收集护照号码和出生日期。"
+          },
+          "ko-KR": {
+            "subtitle": "알마티 출발 프라이빗 투어",
+            "description": "Treeple는 카자흐스탄 알마티에 있는 투어 운영사입니다. 이 플러그인은 카자흐스탄의 가이드 투어(알마티 산악, 차린 캐니언, 콜사이·카인디 호수, 알틴에멜, 망기스타우, 아스타나)와 키르기스스탄(이식쿨·송쿨)으로 이어지는 장기 일정 하나를 담은 카탈로그를 엽니다. 모든 투어는 알마티에서 출발합니다.\n\n장소, 주제, 기간, 일행 구성, 예산으로 투어를 검색하고, 일자별 일정과 포함 및 불포함 항목, 집결 장소, 취소 조건, 사진, 검증된 후기를 보여 줍니다. 특정 일행과 날짜에 대한 정확한 미화 총액을 계산하고, 출발 가능 날짜를 표시하며, 원하는 일수에 맞는 투어 묶음을 구성합니다.\n\n결제는 처리하지 않고 카드 정보도 요청하지 않습니다. 결제는 담당자와 함께 treeple.kz에서 진행됩니다. 요청은 예약이 아니며, 출발과 호텔, 최종 금액은 담당자가 확인한 뒤 이메일, WhatsApp 또는 Telegram으로 답변합니다. 여권 번호와 생년월일은 수집하지 않습니다."
+          }
+        }
+      }
+    }
+  }
+}
